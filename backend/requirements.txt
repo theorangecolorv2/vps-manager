@@ -1,0 +1,20 @@
+# Web framework
+fastapi==0.115.6
+uvicorn[standard]==0.34.0  # ASGI сервер с поддержкой hot-reload
+
+# Database
+sqlalchemy==2.0.36         # ORM
+asyncpg==0.30.0            # асинхронный драйвер PostgreSQL
+alembic==1.14.0            # миграции БД
+
+# Validation
+pydantic==2.10.4           # валидация данных (встроено в FastAPI)
+pydantic-settings==2.7.0   # для работы с .env
+
+# Authentication
+python-jose[cryptography]==3.3.0  # JWT токены
+passlib[bcrypt]==1.7.4            # хэширование паролей
+
+# Utilities
+python-dotenv==1.0.1       # загрузка .env файлов
+httpx==0.28.1              # HTTP клиент для пинга серверов

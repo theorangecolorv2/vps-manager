@@ -1,0 +1,64 @@
+version: "3.8"
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: vps-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: vps_user
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-vps_password}
+      POSTGRES_DB: vps_manager
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U vps_user -d vps_manager"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: ./backend
+    container_name: vps-backend
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql+asyncpg://vps_user:${DB_PASSWORD:-vps_password}@db:5432/vps_manager
+      SECRET_KEY: ${SECRET_KEY:-dev-secret-key-change-in-prod}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-admin}
+      PING_INTERVAL_SECONDS: ${PING_INTERVAL_SECONDS:-60}
+    volumes:
+      - ./backend/app:/app/app
+      - ./backend/alembic:/app/alembic
+    depends_on:
+      db:
+        condition: service_healthy
+    command: bash -c "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+
+  frontend:
+    build: ./frontend
+    container_name: vps-frontend
+    restart: unless-stopped
+    volumes:
+      - ./frontend/src:/app/src
+    depends_on:
+      - backend
+
+  caddy:
+    image: caddy:alpine
+    container_name: vps-caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - frontend
+      - backend
+
+volumes:
+  postgres_data:
+  caddy_data:
+  caddy_config:

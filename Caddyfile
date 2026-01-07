@@ -1,0 +1,14 @@
+vps.oblepiha-vpn.online {
+    # Frontend
+    reverse_proxy frontend:5173
+
+    # API proxy
+    handle /api/* {
+        reverse_proxy backend:8000
+    }
+
+    # Health check
+    handle /health {
+        reverse_proxy backend:8000
+    }
+}
