@@ -13,6 +13,9 @@ from app.schemas.schemas import (
     ImportData,
     ServerExport,
     FolderExport,
+    PaymentResponse,
+    PaymentSummary,
+    ExchangeRatesResponse,
 )
 
 __all__ = [
@@ -29,4 +32,7 @@ __all__ = [
     "ImportData",
     "ServerExport",
     "FolderExport",
+    "PaymentResponse",
+    "PaymentSummary",
+    "ExchangeRatesResponse",
 ]
