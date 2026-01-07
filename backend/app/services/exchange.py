@@ -37,9 +37,9 @@ async def fetch_rates_from_cbr() -> dict[str, float]:
             valute = data.get("Valute", {})
 
             if "USD" in valute:
-                rates["USD"] = valute["USD"]["Value"]
+                rates["USD"] = valute["USD"]["Value"] + 5  # +5 RUB commission
             if "EUR" in valute:
-                rates["EUR"] = valute["EUR"]["Value"]
+                rates["EUR"] = valute["EUR"]["Value"] + 5  # +5 RUB commission
 
             return rates
     except Exception as e:

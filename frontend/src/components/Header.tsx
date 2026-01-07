@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react'
-import type { Folder, SortBy } from '../types'
+import type { Folder, SortBy, ExchangeRates } from '../types'
 import { logout, downloadExport, readImportFile, importData } from '../api'
 
 interface HeaderProps {
@@ -10,9 +10,10 @@ interface HeaderProps {
   onSortChange: (sort: SortBy) => void
   showSidebar: boolean
   onToggleSidebar: () => void
+  exchangeRates: ExchangeRates | null
 }
 
-export function Header({ folders, onRefresh, onAddServer, sortBy, onSortChange, showSidebar, onToggleSidebar }: HeaderProps) {
+export function Header({ folders, onRefresh, onAddServer, sortBy, onSortChange, showSidebar, onToggleSidebar, exchangeRates }: HeaderProps) {
   const [importing, setImporting] = useState(false)
   const [exporting, setExporting] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -21,9 +22,14 @@ export function Header({ folders, onRefresh, onAddServer, sortBy, onSortChange, 
   const onlineServers = folders.reduce(
     (sum, f) => sum + f.servers.filter(s => s.status === 'online').length, 0
   )
-  const totalCost = folders.reduce(
-    (sum, f) => sum + f.servers.reduce((s, srv) => s + srv.price, 0), 0
-  )
+
+  // Calculate total cost in RUB
+  const totalCostRub = folders.reduce((sum, f) => {
+    return sum + f.servers.reduce((s, srv) => {
+      const rate = exchangeRates?.rates[srv.currency] ?? (srv.currency === 'RUB' ? 1 : 100)
+      return s + srv.price * rate
+    }, 0)
+  }, 0)
 
   const handleExport = async () => {
     setExporting(true)
@@ -83,8 +89,8 @@ export function Header({ folders, onRefresh, onAddServer, sortBy, onSortChange, 
           <div className="text-xs text-gray-500 uppercase tracking-wide">Online</div>
         </div>
         <div className="text-center">
-          <div className="text-2xl font-bold">~{totalCost.toFixed(0)}</div>
-          <div className="text-xs text-gray-500 uppercase tracking-wide">EUR/month</div>
+          <div className="text-2xl font-bold">~{totalCostRub.toLocaleString('ru-RU', { maximumFractionDigits: 0 })}</div>
+          <div className="text-xs text-gray-500 uppercase tracking-wide">RUB/month</div>
         </div>
       </div>
 

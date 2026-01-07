@@ -61,10 +61,14 @@ export function ServerCard({ server, onEdit, onDelete, onPayment }: ServerCardPr
 
   return (
     <div className="bg-dark-700 rounded-lg p-4 border border-dark-500 hover:border-dark-400 hover:bg-dark-600 transition-all group relative">
-      {/* Paid indicator */}
-      {paidThisMonth && (
-        <div className="absolute top-2 left-2 px-2 py-0.5 bg-green-500/20 text-green-400 text-xs rounded-full">
-          Paid
+      {/* Payment status indicator */}
+      {server.price > 0 && (
+        <div className={`absolute top-2 left-2 px-2 py-0.5 text-xs rounded-full ${
+          paidThisMonth
+            ? 'bg-green-500/20 text-green-400'
+            : 'bg-red-500/20 text-red-400'
+        }`}>
+          {paidThisMonth ? 'Paid' : 'Unpaid'}
         </div>
       )}
 
