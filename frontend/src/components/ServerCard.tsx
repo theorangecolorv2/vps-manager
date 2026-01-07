@@ -61,20 +61,8 @@ export function ServerCard({ server, onEdit, onDelete, onPayment }: ServerCardPr
 
   return (
     <div className="bg-dark-700 rounded-lg p-4 border border-dark-500 hover:border-dark-400 hover:bg-dark-600 transition-all group relative">
-      {/* Payment status indicator */}
-      {server.price > 0 && (
-        <div className={`absolute top-2 left-2 px-2 py-0.5 text-xs rounded-full ${
-          paidThisMonth
-            ? 'bg-green-500/20 text-green-400'
-            : 'bg-red-500/20 text-red-400'
-        }`}>
-          {paidThisMonth ? 'Paid' : 'Unpaid'}
-        </div>
-      )}
-
       {/* Action buttons */}
-      <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-        {/* Payment button - show only if has price and not paid this month */}
+      <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-10">
         {server.price > 0 && !paidThisMonth && (
           <button
             onClick={handlePayment}
@@ -107,8 +95,17 @@ export function ServerCard({ server, onEdit, onDelete, onPayment }: ServerCardPr
         </button>
       </div>
 
-      <div className="flex justify-between items-start mb-2">
+      <div className="flex items-center gap-2 mb-2 flex-wrap">
         <h3 className="font-semibold text-white">{server.name}</h3>
+        {server.price > 0 && (
+          <span className={`px-2 py-0.5 text-xs rounded-full ${
+            paidThisMonth
+              ? 'bg-green-500/20 text-green-400'
+              : 'bg-red-500/20 text-red-400'
+          }`}>
+            {paidThisMonth ? 'Paid' : 'Unpaid'}
+          </span>
+        )}
         <StatusBadge status={server.status} />
       </div>
 
