@@ -10,6 +10,7 @@ export interface Server {
   currency: string
   paymentDate: string
   lastPing?: number
+  lastPaidMonth?: string  // "2026-01"
 }
 
 export interface Folder {
@@ -18,3 +19,30 @@ export interface Folder {
   color: string
   servers: Server[]
 }
+
+export interface Payment {
+  id: string
+  serverId: string
+  serverName: string
+  amount: number
+  currency: string
+  amountRub: number
+  exchangeRate: number
+  paidAt: string
+  paymentMonth: string
+}
+
+export interface PaymentSummary {
+  totalRub: number
+  byCurrency: Record<string, number>
+  byCurrencyRub: Record<string, number>
+  paymentsCount: number
+  month: string
+}
+
+export interface ExchangeRates {
+  rates: Record<string, number>
+  updatedAt: string | null
+}
+
+export type SortBy = 'position' | 'payment_urgency'

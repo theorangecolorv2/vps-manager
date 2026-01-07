@@ -2,7 +2,7 @@
  * Folders API
  */
 import { apiRequest } from './client'
-import type { Folder } from '../types'
+import type { Folder, SortBy } from '../types'
 
 // API response types (match backend schemas)
 interface FolderResponse {
@@ -25,6 +25,7 @@ interface ServerResponse {
   status: 'online' | 'offline' | 'unknown'
   last_ping: number | null
   last_check: string | null
+  last_paid_month: string | null
 }
 
 // Transform API response to frontend types
@@ -43,12 +44,13 @@ function transformFolder(f: FolderResponse): Folder {
       currency: s.currency,
       paymentDate: s.payment_date,
       lastPing: s.last_ping ?? undefined,
+      lastPaidMonth: s.last_paid_month ?? undefined,
     })),
   }
 }
 
-export async function getFolders(): Promise<Folder[]> {
-  const response = await apiRequest<FolderResponse[]>('/folders')
+export async function getFolders(sortBy: SortBy = 'position'): Promise<Folder[]> {
+  const response = await apiRequest<FolderResponse[]>(`/folders?sort_by=${sortBy}`)
   return response.map(transformFolder)
 }
 

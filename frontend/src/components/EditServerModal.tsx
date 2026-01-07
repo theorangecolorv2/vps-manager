@@ -9,9 +9,16 @@ interface EditServerModalProps {
   onSuccess: () => void
   server: Server | null
   folders: Folder[]
+  onPayment?: (server: Server) => void
 }
 
-export function EditServerModal({ isOpen, onClose, onSuccess, server, folders }: EditServerModalProps) {
+function isPaidThisMonth(lastPaidMonth?: string): boolean {
+  if (!lastPaidMonth) return false
+  const currentMonth = new Date().toISOString().slice(0, 7)
+  return lastPaidMonth === currentMonth
+}
+
+export function EditServerModal({ isOpen, onClose, onSuccess, server, folders, onPayment }: EditServerModalProps) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -155,6 +162,29 @@ export function EditServerModal({ isOpen, onClose, onSuccess, server, folders }:
             ))}
           </select>
         </div>
+
+        {/* Payment Status Section */}
+        {server.price > 0 && (
+          <div className="border-t border-gray-700 pt-4">
+            <label className="block text-sm text-gray-400 mb-2">Payment Status</label>
+            {isPaidThisMonth(server.lastPaidMonth) ? (
+              <div className="flex items-center gap-2 text-green-400">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+                Paid this month
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => onPayment?.(server)}
+                className="w-full py-2 bg-green-600 hover:bg-green-500 rounded-lg transition-colors font-semibold"
+              >
+                Mark as Paid
+              </button>
+            )}
+          </div>
+        )}
 
         {error && <div className="text-red-400 text-sm">{error}</div>}
 

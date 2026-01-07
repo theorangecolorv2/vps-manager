@@ -51,6 +51,7 @@ class ServerResponse(ServerBase):
     status: ServerStatus = "unknown"
     last_ping: int | None = None
     last_check: datetime | None = None
+    last_paid_month: str | None = None
 
     class Config:
         from_attributes = True
@@ -121,3 +122,41 @@ class ImportData(BaseModel):
     """Import format (same as export)"""
     version: str = "1.0"
     folders: list[FolderExport]
+
+
+# ============ Payments ============
+
+class PaymentCreate(BaseModel):
+    """Create payment request (amount/currency taken from server)"""
+    pass  # No fields needed - amount and currency come from server
+
+
+class PaymentResponse(BaseModel):
+    id: int
+    server_id: int
+    server_name: str
+    amount: float
+    currency: str
+    amount_rub: float
+    exchange_rate: float
+    paid_at: datetime
+    payment_month: str
+
+    class Config:
+        from_attributes = True
+
+
+class PaymentSummary(BaseModel):
+    """Monthly payment summary"""
+    total_rub: float
+    by_currency: dict[str, float]  # {"EUR": 50.0, "USD": 100.0, "RUB": 0.0}
+    by_currency_rub: dict[str, float]  # {"EUR": 5200.0, "USD": 10220.0, "RUB": 0.0}
+    payments_count: int
+    month: str  # "2026-01"
+
+
+# ============ Exchange Rates ============
+
+class ExchangeRatesResponse(BaseModel):
+    rates: dict[str, float]  # {"EUR": 104.0, "USD": 102.2, "RUB": 1.0}
+    updated_at: datetime | None

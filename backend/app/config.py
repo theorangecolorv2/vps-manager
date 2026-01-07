@@ -18,6 +18,10 @@ class Settings(BaseSettings):
     ping_interval_seconds: int = 60  # как часто пинговать серверы
     ping_timeout_seconds: int = 5    # таймаут пинга
 
+    # Exchange rates
+    exchange_rate_ttl_seconds: int = 3600  # 1 hour cache
+    exchange_api_url: str = "https://www.cbr-xml-daily.ru/daily_json.js"
+
     class Config:
         env_file = ".env"
 

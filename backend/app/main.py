@@ -7,7 +7,14 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.routers import auth_router, folders_router, servers_router, backup_router
+from app.routers import (
+    auth_router,
+    folders_router,
+    servers_router,
+    backup_router,
+    payments_router,
+    exchange_router,
+)
 from app.services import ping_loop
 
 
@@ -41,7 +48,12 @@ app = FastAPI(
 # CORS middleware for frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
+    allow_origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "https://vps.oblepiha-vpn.online",
+        "http://vps.oblepiha-vpn.online",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -52,6 +64,8 @@ app.include_router(auth_router, prefix="/api")
 app.include_router(folders_router, prefix="/api")
 app.include_router(servers_router, prefix="/api")
 app.include_router(backup_router, prefix="/api")
+app.include_router(payments_router, prefix="/api")
+app.include_router(exchange_router, prefix="/api")
 
 
 @app.get("/")

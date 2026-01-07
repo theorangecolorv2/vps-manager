@@ -1,14 +1,18 @@
 import { useState, useRef } from 'react'
-import type { Folder } from '../types'
+import type { Folder, SortBy } from '../types'
 import { logout, downloadExport, readImportFile, importData } from '../api'
 
 interface HeaderProps {
   folders: Folder[]
   onRefresh?: () => void
   onAddServer?: () => void
+  sortBy: SortBy
+  onSortChange: (sort: SortBy) => void
+  showSidebar: boolean
+  onToggleSidebar: () => void
 }
 
-export function Header({ folders, onRefresh, onAddServer }: HeaderProps) {
+export function Header({ folders, onRefresh, onAddServer, sortBy, onSortChange, showSidebar, onToggleSidebar }: HeaderProps) {
   const [importing, setImporting] = useState(false)
   const [exporting, setExporting] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -85,6 +89,32 @@ export function Header({ folders, onRefresh, onAddServer }: HeaderProps) {
       </div>
 
       <div className="flex items-center gap-3">
+        {/* Sort toggle */}
+        <div className="flex rounded-lg overflow-hidden border border-dark-500">
+          <button
+            onClick={() => onSortChange('position')}
+            className={`px-3 py-2 text-sm transition-colors ${
+              sortBy === 'position'
+                ? 'bg-indigo-600 text-white'
+                : 'bg-dark-600 hover:bg-dark-500 text-gray-400'
+            }`}
+            title="Sort by position"
+          >
+            Position
+          </button>
+          <button
+            onClick={() => onSortChange('payment_urgency')}
+            className={`px-3 py-2 text-sm transition-colors ${
+              sortBy === 'payment_urgency'
+                ? 'bg-indigo-600 text-white'
+                : 'bg-dark-600 hover:bg-dark-500 text-gray-400'
+            }`}
+            title="Sort by payment urgency"
+          >
+            Urgency
+          </button>
+        </div>
+
         {/* Refresh button */}
         <button
           onClick={onRefresh}
@@ -143,6 +173,19 @@ export function Header({ folders, onRefresh, onAddServer }: HeaderProps) {
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+          </svg>
+        </button>
+
+        {/* Toggle sidebar button */}
+        <button
+          onClick={onToggleSidebar}
+          className={`p-2.5 rounded-lg transition-colors ${
+            showSidebar ? 'bg-indigo-600 text-white' : 'bg-dark-600 hover:bg-dark-500'
+          }`}
+          title={showSidebar ? 'Hide payments' : 'Show payments'}
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
         </button>
       </div>

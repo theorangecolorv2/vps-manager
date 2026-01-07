@@ -2,9 +2,10 @@
  * API client with authentication
  */
 
-// In production, API is proxied through nginx on same origin
-// In development, use localhost:8000
-const API_BASE = import.meta.env.DEV ? 'http://localhost:8000/api' : '/api'
+// API is proxied through Caddy on same origin
+// Only use localhost:8000 when actually running on localhost
+const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+const API_BASE = import.meta.env.DEV && isLocalhost ? 'http://localhost:8000/api' : '/api'
 
 // Token storage
 const TOKEN_KEY = 'vps_manager_token'

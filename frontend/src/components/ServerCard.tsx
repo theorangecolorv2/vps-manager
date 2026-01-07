@@ -7,6 +7,13 @@ interface ServerCardProps {
   server: Server
   onEdit?: (server: Server) => void
   onDelete?: () => void
+  onPayment?: (server: Server) => void
+}
+
+function isPaidThisMonth(lastPaidMonth?: string): boolean {
+  if (!lastPaidMonth) return false
+  const currentMonth = new Date().toISOString().slice(0, 7)
+  return lastPaidMonth === currentMonth
 }
 
 function getPingColor(ping: number): string {
@@ -15,9 +22,10 @@ function getPingColor(ping: number): string {
   return 'text-red-500'
 }
 
-export function ServerCard({ server, onEdit, onDelete }: ServerCardProps) {
+export function ServerCard({ server, onEdit, onDelete, onPayment }: ServerCardProps) {
   const [copied, setCopied] = useState(false)
   const [deleting, setDeleting] = useState(false)
+  const paidThisMonth = isPaidThisMonth(server.lastPaidMonth)
 
   const copyIP = (e: React.MouseEvent) => {
     e.stopPropagation()
@@ -46,10 +54,34 @@ export function ServerCard({ server, onEdit, onDelete }: ServerCardProps) {
     onEdit?.(server)
   }
 
+  const handlePayment = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    onPayment?.(server)
+  }
+
   return (
     <div className="bg-dark-700 rounded-lg p-4 border border-dark-500 hover:border-dark-400 hover:bg-dark-600 transition-all group relative">
+      {/* Paid indicator */}
+      {paidThisMonth && (
+        <div className="absolute top-2 left-2 px-2 py-0.5 bg-green-500/20 text-green-400 text-xs rounded-full">
+          Paid
+        </div>
+      )}
+
       {/* Action buttons */}
       <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+        {/* Payment button - show only if has price and not paid this month */}
+        {server.price > 0 && !paidThisMonth && (
+          <button
+            onClick={handlePayment}
+            className="p-1.5 rounded bg-dark-500 hover:bg-green-600 transition-colors"
+            title="Mark as paid"
+          >
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
+          </button>
+        )}
         <button
           onClick={handleEdit}
           className="p-1.5 rounded bg-dark-500 hover:bg-blue-600 transition-colors"

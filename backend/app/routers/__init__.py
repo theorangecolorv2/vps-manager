@@ -3,5 +3,14 @@ from app.routers.auth import router as auth_router
 from app.routers.folders import router as folders_router
 from app.routers.servers import router as servers_router
 from app.routers.backup import router as backup_router
+from app.routers.payments import router as payments_router
+from app.routers.exchange import router as exchange_router
 
-__all__ = ["auth_router", "folders_router", "servers_router", "backup_router"]
+__all__ = [
+    "auth_router",
+    "folders_router",
+    "servers_router",
+    "backup_router",
+    "payments_router",
+    "exchange_router",
+]

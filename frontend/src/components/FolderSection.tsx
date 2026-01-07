@@ -7,9 +7,10 @@ interface FolderSectionProps {
   onToggle: () => void
   onRefresh?: () => void
   onEditServer?: (server: Server) => void
+  onPaymentServer?: (server: Server) => void
 }
 
-export function FolderSection({ folder, isExpanded, onToggle, onRefresh, onEditServer }: FolderSectionProps) {
+export function FolderSection({ folder, isExpanded, onToggle, onRefresh, onEditServer, onPaymentServer }: FolderSectionProps) {
   const onlineCount = folder.servers.filter(s => s.status === 'online').length
   const totalCost = folder.servers.reduce((sum, s) => sum + s.price, 0)
 
@@ -52,6 +53,7 @@ export function FolderSection({ folder, isExpanded, onToggle, onRefresh, onEditS
                 server={server}
                 onEdit={onEditServer}
                 onDelete={onRefresh}
+                onPayment={onPaymentServer}
               />
             ))}
           </div>
