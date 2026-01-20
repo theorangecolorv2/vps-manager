@@ -5,6 +5,7 @@ from app.routers.servers import router as servers_router
 from app.routers.backup import router as backup_router
 from app.routers.payments import router as payments_router
 from app.routers.exchange import router as exchange_router
+from app.routers.metrics import router as metrics_router
 
 __all__ = [
     "auth_router",
@@ -13,4 +14,5 @@ __all__ = [
     "backup_router",
     "payments_router",
     "exchange_router",
+    "metrics_router",
 ]

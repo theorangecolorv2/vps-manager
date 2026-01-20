@@ -55,11 +55,17 @@ class Server(Base):
     # Payment tracking
     last_paid_month: Mapped[str | None] = mapped_column(String(7), nullable=True)  # "2026-01"
 
+    # Agent token for metrics collection
+    agent_token: Mapped[str | None] = mapped_column(String(64), nullable=True, unique=True)
+
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
     folder: Mapped["Folder"] = relationship("Folder", back_populates="servers")
     payments: Mapped[list["Payment"]] = relationship(
         "Payment", back_populates="server", cascade="all, delete-orphan"
+    )
+    metrics: Mapped[list["ServerMetrics"]] = relationship(
+        "ServerMetrics", back_populates="server", cascade="all, delete-orphan"
     )
 
 
@@ -89,3 +95,29 @@ class ExchangeRate(Base):
     currency: Mapped[str] = mapped_column(String(3), nullable=False, unique=True)  # EUR, USD
     rate_to_rub: Mapped[float] = mapped_column(Float, nullable=False)
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
+class ServerMetrics(Base):
+    """Server metrics collected by agent"""
+    __tablename__ = "server_metrics"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    server_id: Mapped[int] = mapped_column(Integer, ForeignKey("servers.id", ondelete="CASCADE"), nullable=False)
+
+    cpu_percent: Mapped[float] = mapped_column(Float, nullable=False)
+    memory_percent: Mapped[float] = mapped_column(Float, nullable=False)
+    memory_used_mb: Mapped[int] = mapped_column(Integer, nullable=False)
+    memory_total_mb: Mapped[int] = mapped_column(Integer, nullable=False)
+
+    disk_percent: Mapped[float] = mapped_column(Float, nullable=False)
+    disk_used_gb: Mapped[float] = mapped_column(Float, nullable=False)
+    disk_total_gb: Mapped[float] = mapped_column(Float, nullable=False)
+
+    uptime_seconds: Mapped[int] = mapped_column(Integer, nullable=False)
+    load_avg_1: Mapped[float] = mapped_column(Float, nullable=True)  # 1 min load average
+    load_avg_5: Mapped[float] = mapped_column(Float, nullable=True)  # 5 min
+    load_avg_15: Mapped[float] = mapped_column(Float, nullable=True)  # 15 min
+
+    collected_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+    server: Mapped["Server"] = relationship("Server", back_populates="metrics")

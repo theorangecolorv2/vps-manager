@@ -160,3 +160,56 @@ class PaymentSummary(BaseModel):
 class ExchangeRatesResponse(BaseModel):
     rates: dict[str, float]  # {"EUR": 104.0, "USD": 102.2, "RUB": 1.0}
     updated_at: datetime | None
+
+
+# ============ Server Metrics ============
+
+class MetricsSubmit(BaseModel):
+    """Metrics submitted by agent"""
+    cpu_percent: float = Field(..., ge=0, le=100)
+    memory_percent: float = Field(..., ge=0, le=100)
+    memory_used_mb: int = Field(..., ge=0)
+    memory_total_mb: int = Field(..., ge=0)
+    disk_percent: float = Field(..., ge=0, le=100)
+    disk_used_gb: float = Field(..., ge=0)
+    disk_total_gb: float = Field(..., ge=0)
+    uptime_seconds: int = Field(..., ge=0)
+    load_avg_1: float | None = None
+    load_avg_5: float | None = None
+    load_avg_15: float | None = None
+
+
+class MetricsResponse(BaseModel):
+    """Single metrics record"""
+    cpu_percent: float
+    memory_percent: float
+    memory_used_mb: int
+    memory_total_mb: int
+    disk_percent: float
+    disk_used_gb: float
+    disk_total_gb: float
+    uptime_seconds: int
+    load_avg_1: float | None
+    load_avg_5: float | None
+    load_avg_15: float | None
+    collected_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class MetricsHistoryResponse(BaseModel):
+    """Metrics history for a server"""
+    server_id: int
+    server_name: str
+    current: MetricsResponse | None
+    history: list[MetricsResponse]
+    avg_cpu_12h: float | None
+    avg_memory_12h: float | None
+
+
+class AgentTokenResponse(BaseModel):
+    """Response with agent token"""
+    agent_token: str
+    server_id: int
+    server_name: str

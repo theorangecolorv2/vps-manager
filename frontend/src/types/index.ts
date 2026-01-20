@@ -46,3 +46,45 @@ export interface ExchangeRates {
 }
 
 export type SortBy = 'position' | 'payment_urgency'
+
+// Metrics types
+export interface ServerMetrics {
+  cpuPercent: number
+  memoryPercent: number
+  memoryUsedMb: number
+  memoryTotalMb: number
+  diskPercent: number
+  diskUsedGb: number
+  diskTotalGb: number
+  uptimeSeconds: number
+  loadAvg1: number | null
+  loadAvg5: number | null
+  loadAvg15: number | null
+  collectedAt: string
+}
+
+export interface MetricsHistory {
+  serverId: number
+  serverName: string
+  current: ServerMetrics | null
+  history: ServerMetrics[]
+  avgCpu12h: number | null
+  avgMemory12h: number | null
+}
+
+export interface AgentToken {
+  agentToken: string
+  serverId: number
+  serverName: string
+}
+
+export interface CurrentMetrics {
+  cpuPercent: number
+  memoryPercent: number
+  memoryUsedMb: number
+  memoryTotalMb: number
+  diskPercent: number
+  collectedAt: string
+}
+
+export type AllMetrics = Record<string, CurrentMetrics>

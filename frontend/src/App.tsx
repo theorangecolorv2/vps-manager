@@ -5,6 +5,7 @@ import { AddServerModal } from './components/AddServerModal'
 import { EditServerModal } from './components/EditServerModal'
 import { PaymentConfirmModal } from './components/PaymentConfirmModal'
 import { PaymentSidebar } from './components/PaymentSidebar'
+import { MetricsModal } from './components/MetricsModal'
 import { LoginPage } from './pages/LoginPage'
 import {
   isAuthenticated,
@@ -13,8 +14,9 @@ import {
   getPayments,
   getPaymentSummary,
   getExchangeRates,
+  getAllCurrentMetrics,
 } from './api'
-import type { Folder, Server, SortBy, Payment, PaymentSummary, ExchangeRates } from './types'
+import type { Folder, Server, SortBy, Payment, PaymentSummary, ExchangeRates, AllMetrics } from './types'
 
 export default function App() {
   const [folders, setFolders] = useState<Folder[]>([])
@@ -28,9 +30,11 @@ export default function App() {
   const [sortBy, setSortBy] = useState<SortBy>('position')
   const [showSidebar, setShowSidebar] = useState(false)
   const [confirmingPayment, setConfirmingPayment] = useState<Server | null>(null)
+  const [metricsServer, setMetricsServer] = useState<Server | null>(null)
   const [paymentSummary, setPaymentSummary] = useState<PaymentSummary | null>(null)
   const [exchangeRates, setExchangeRates] = useState<ExchangeRates | null>(null)
   const [recentPayments, setRecentPayments] = useState<Payment[]>([])
+  const [allMetrics, setAllMetrics] = useState<AllMetrics>({})
 
   const isLoginPage = window.location.pathname === '/login'
 
@@ -69,6 +73,15 @@ export default function App() {
     }
   }, [])
 
+  const loadMetrics = useCallback(async () => {
+    try {
+      const metrics = await getAllCurrentMetrics()
+      setAllMetrics(metrics)
+    } catch (err) {
+      console.error('Failed to load metrics:', err)
+    }
+  }, [])
+
   useEffect(() => {
     if (!isLoginPage && !isAuthenticated()) {
       window.location.href = '/login'
@@ -77,8 +90,13 @@ export default function App() {
     if (!isLoginPage && isAuthenticated()) {
       loadFolders()
       loadPaymentData()
+      loadMetrics()
+
+      // Refresh metrics every 60 seconds
+      const metricsInterval = setInterval(loadMetrics, 60000)
+      return () => clearInterval(metricsInterval)
     }
-  }, [isLoginPage, loadFolders, loadPaymentData])
+  }, [isLoginPage, loadFolders, loadPaymentData, loadMetrics])
 
   // Reload folders when sortBy changes
   useEffect(() => {
@@ -173,9 +191,11 @@ export default function App() {
                   folder={folder}
                   isExpanded={expandedFolders.has(folder.id)}
                   onToggle={() => toggleFolder(folder.id)}
-                  onRefresh={() => { loadFolders(); loadPaymentData(); }}
+                  onRefresh={() => { loadFolders(); loadPaymentData(); loadMetrics(); }}
                   onEditServer={setEditingServer}
                   onPaymentServer={handlePaymentRequest}
+                  onMetricsServer={setMetricsServer}
+                  allMetrics={allMetrics}
                 />
               ))}
             </div>
@@ -216,6 +236,12 @@ export default function App() {
         onConfirm={handleConfirmPayment}
         server={confirmingPayment}
         exchangeRates={exchangeRates}
+      />
+
+      <MetricsModal
+        isOpen={!!metricsServer}
+        onClose={() => setMetricsServer(null)}
+        server={metricsServer}
       />
     </div>
   )

@@ -1,4 +1,4 @@
-import type { Folder, Server } from '../types'
+import type { Folder, Server, AllMetrics } from '../types'
 import { ServerCard } from './ServerCard'
 
 interface FolderSectionProps {
@@ -8,9 +8,11 @@ interface FolderSectionProps {
   onRefresh?: () => void
   onEditServer?: (server: Server) => void
   onPaymentServer?: (server: Server) => void
+  onMetricsServer?: (server: Server) => void
+  allMetrics?: AllMetrics
 }
 
-export function FolderSection({ folder, isExpanded, onToggle, onRefresh, onEditServer, onPaymentServer }: FolderSectionProps) {
+export function FolderSection({ folder, isExpanded, onToggle, onRefresh, onEditServer, onPaymentServer, onMetricsServer, allMetrics }: FolderSectionProps) {
   const onlineCount = folder.servers.filter(s => s.status === 'online').length
   const totalCost = folder.servers.reduce((sum, s) => sum + s.price, 0)
 
@@ -51,9 +53,11 @@ export function FolderSection({ folder, isExpanded, onToggle, onRefresh, onEditS
               <ServerCard
                 key={server.id}
                 server={server}
+                metrics={allMetrics?.[server.id]}
                 onEdit={onEditServer}
                 onDelete={onRefresh}
                 onPayment={onPaymentServer}
+                onMetrics={onMetricsServer}
               />
             ))}
           </div>

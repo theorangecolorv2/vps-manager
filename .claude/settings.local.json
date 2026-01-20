@@ -6,7 +6,9 @@
       "Bash(if not exist \"C:\\\\Users\\\\theorr\\\\.claude\" mkdir \"C:\\\\Users\\\\theorr\\\\.claude\")",
       "Bash(powershell:*)",
       "mcp__ide__getDiagnostics",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(find:*)",
+      "Bash(ssh root@185.87.193.96 \"cd /opt/vps-manager && git status && git remote -v\")"
     ]
   }
 }
