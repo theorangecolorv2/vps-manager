@@ -85,29 +85,13 @@ export function MetricsModal({ isOpen, onClose, server }: MetricsModalProps) {
   const getInstallCommand = () => {
     if (!token) return ''
     const apiUrl = window.location.origin
-    return `docker run -d --name vps-agent --restart=always --network=host \\
+    return `curl -sL https://raw.githubusercontent.com/theorangecolorv2/vps-manager/main/agent/agent.py -o /tmp/vps-agent.py && \\
+docker run -d --name vps-agent --restart=always --network=host \\
   -e API_URL="${apiUrl}" \\
   -e AGENT_TOKEN="${token.agentToken}" \\
   -e INTERVAL="60" \\
-  python:3.11-alpine sh -c "pip install -q psutil requests && python -c '
-import os,sys,time,signal
-import psutil,requests
-API=os.environ[\"API_URL\"];TK=os.environ[\"AGENT_TOKEN\"];INT=60
-running=True
-def stop(s,f):global running;running=False
-signal.signal(signal.SIGTERM,stop);signal.signal(signal.SIGINT,stop)
-while running:
- try:
-  cpu=psutil.cpu_percent(1);mem=psutil.virtual_memory();disk=psutil.disk_usage(\"/\")
-  up=int(time.time()-psutil.boot_time());load=(None,None,None)
-  try:load=os.getloadavg()
-  except:pass
-  requests.post(f\"{API}/api/metrics/submit\",json={\"cpu_percent\":cpu,\"memory_percent\":mem.percent,\"memory_used_mb\":mem.used//(1024*1024),\"memory_total_mb\":mem.total//(1024*1024),\"disk_percent\":disk.percent,\"disk_used_gb\":round(disk.used/(1024**3),2),\"disk_total_gb\":round(disk.total/(1024**3),2),\"uptime_seconds\":up,\"load_avg_1\":round(load[0],2) if load[0] else None,\"load_avg_5\":round(load[1],2) if load[1] else None,\"load_avg_15\":round(load[2],2) if load[2] else None},headers={\"X-Agent-Token\":TK},timeout=10)
- except:pass
- for _ in range(INT):
-  if not running:break
-  time.sleep(1)
-'"`
+  -v /tmp/vps-agent.py:/app/agent.py:ro \\
+  python:3.11-alpine sh -c "pip install -q psutil requests && python -u /app/agent.py"`
   }
 
   const copyCommand = () => {
