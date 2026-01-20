@@ -16,6 +16,10 @@ from app.schemas.schemas import (
     PaymentResponse,
     PaymentSummary,
     ExchangeRatesResponse,
+    MetricsSubmit,
+    MetricsResponse,
+    MetricsHistoryResponse,
+    AgentTokenResponse,
 )
 
 __all__ = [
@@ -35,4 +39,8 @@ __all__ = [
     "PaymentResponse",
     "PaymentSummary",
     "ExchangeRatesResponse",
+    "MetricsSubmit",
+    "MetricsResponse",
+    "MetricsHistoryResponse",
+    "AgentTokenResponse",
 ]
