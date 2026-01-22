@@ -196,6 +196,7 @@ export default function App() {
                   onPaymentServer={handlePaymentRequest}
                   onMetricsServer={setMetricsServer}
                   allMetrics={allMetrics}
+                  exchangeRates={exchangeRates}
                 />
               ))}
             </div>

@@ -1,4 +1,4 @@
-import type { Folder, Server, AllMetrics } from '../types'
+import type { Folder, Server, AllMetrics, ExchangeRates } from '../types'
 import { ServerCard } from './ServerCard'
 
 interface FolderSectionProps {
@@ -10,11 +10,15 @@ interface FolderSectionProps {
   onPaymentServer?: (server: Server) => void
   onMetricsServer?: (server: Server) => void
   allMetrics?: AllMetrics
+  exchangeRates?: ExchangeRates | null
 }
 
-export function FolderSection({ folder, isExpanded, onToggle, onRefresh, onEditServer, onPaymentServer, onMetricsServer, allMetrics }: FolderSectionProps) {
+export function FolderSection({ folder, isExpanded, onToggle, onRefresh, onEditServer, onPaymentServer, onMetricsServer, allMetrics, exchangeRates }: FolderSectionProps) {
   const onlineCount = folder.servers.filter(s => s.status === 'online').length
-  const totalCost = folder.servers.reduce((sum, s) => sum + s.price, 0)
+  const totalCostRub = folder.servers.reduce((sum, s) => {
+    const rate = exchangeRates?.rates[s.currency] ?? (s.currency === 'RUB' ? 1 : 100)
+    return sum + s.price * rate
+  }, 0)
 
   return (
     <div className="bg-dark-800 rounded-xl border border-dark-500 overflow-hidden">
@@ -38,7 +42,7 @@ export function FolderSection({ folder, isExpanded, onToggle, onRefresh, onEditS
             {onlineCount}/{folder.servers.length}
           </span>
           <span className="text-sm text-gray-500 font-mono">
-            ~{totalCost.toFixed(0)} EUR/mo
+            ~{totalCostRub.toLocaleString('ru-RU', { maximumFractionDigits: 0 })} ₽/mo
           </span>
           <span className={`text-2xl text-gray-500 transition-transform ${isExpanded ? 'rotate-90' : ''}`}>
             ›
