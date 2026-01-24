@@ -7,7 +7,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.routers import auth_router, folders_router, servers_router, backup_router, metrics_router, payments_router
+from app.routers import auth_router, folders_router, servers_router, backup_router, metrics_router, payments_router, exchange_router
 from app.services import ping_loop
 
 
@@ -59,6 +59,7 @@ app.include_router(servers_router, prefix="/api")
 app.include_router(backup_router, prefix="/api")
 app.include_router(metrics_router, prefix="/api")
 app.include_router(payments_router, prefix="/api")
+app.include_router(exchange_router, prefix="/api")
 
 
 @app.get("/")
